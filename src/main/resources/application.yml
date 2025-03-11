@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: blog
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate.ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: z24FQfkb+2mD0mHn9Do4Te25f3e6bwt1b7gq4N9l6uA=
