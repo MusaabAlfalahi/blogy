@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blog.services.AuthenticationService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,28 +26,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractToken(request);
             if (token != null) {
                 String email = authenticationService.extractUsername(token);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(token);
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(email);
 
-//                UsernamePasswordAuthenticationToken authentication =
-//                        new UsernamePasswordAuthenticationToken(
-//                                userDetails,
-//                                null,
-//                                userDetails.getAuthorities()
-//                        );
-//
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//                if (userDetails instanceof BlogUserDetails) {
-//                    request.setAttribute("userId",
-//                            ((BlogUserDetails) userDetails).getId());
-//                }
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
 
                 if (authenticationService.validateToken(token, userDetails)) {
-                    SecurityContextHolder.getContext().setAuthentication(
-                            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities()
-                            )
-                    );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    if (userDetails instanceof BlogUserDetails) {
+                        request.setAttribute("userId",
+                                ((BlogUserDetails) userDetails).getId());
+                    }
                 }
             }
         } catch (Exception e) {
